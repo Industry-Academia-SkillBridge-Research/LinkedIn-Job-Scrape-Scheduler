@@ -1,29 +1,31 @@
 # LinkedIn Job Scraper Scheduler
 
-A comprehensive automated LinkedIn job scraping system with REST API, scheduled scraping, Elasticsearch integration, and advanced job filtering capabilities.
+A comprehensive automated LinkedIn job scraping system with REST API, scheduled scraping, Elasticsearch integration, and role-based job categorization with unique identifiers.
 
 ## 🌟 Features
 
 ### Core Features
-- **🤖 Automated Scheduling**: Schedule recurring job scrapes (weekly, daily) with customizable timing
+- **🤖 Automated Scheduling**: Weekly automated scraping every Monday at 9:00 AM
+- **🏷️ Role-Based Categorization**: Unique job IDs with role tags (DA_001, SE_042, AIML_015, etc.)
 - **🔍 Multiple Scraping Methods**: BeautifulSoup for fast scraping, Selenium for dynamic content
 - **📊 Elasticsearch Integration**: Store and search job listings with powerful analytics
-- **🌐 REST API**: FastAPI-based API with Swagger UI for easy interaction
+- **🌐 REST API**: FastAPI-based API with Swagger UI documentation
 - **🎯 Smart Job Filtering**: 
+  - Deduplication by company + title + location
+  - Post age filtering (only last 21 days)
+  - Location prioritization (Sri Lanka primary, USA/India/UK fallback)
   - Exact match job titles
-  - Post age filtering (e.g., only jobs from last 21 days)
-  - Location prioritization (primary + fallback locations)
-  - Country-specific search
+  - Country-specific categorization
 - **💾 Multiple Export Formats**: CSV, JSON, Excel
 - **🐳 Docker Support**: Full containerization with docker-compose
 - **📈 Kibana Visualization**: Optional Kibana integration for data visualization
 
 ### Advanced Features
-- **Skills Extraction**: Automatically extract and analyze skills from job descriptions
+- **400+ Skills Detection**: Comprehensive skill extraction covering Data Engineering, Cloud, DevOps, Programming, Databases, BI tools, and more
 - **Top Skills Analysis**: Find most demanded skills by job role
+- **Sequential Job IDs**: Unique identifiers per role per scraping run
 - **Rate Limiting**: Built-in delays to avoid being blocked
 - **User-Agent Rotation**: Randomized user agents to mimic real browsers
-- **Job Quality Control**: Filter jobs by post date, exact match, and more
 
 ## 📋 Prerequisites
 
@@ -33,44 +35,44 @@ A comprehensive automated LinkedIn job scraping system with REST API, scheduled 
 
 ## 🚀 Quick Start
 
-### Option 1: Docker Deployment (Recommended)
+### Docker Deployment (Recommended)
 
 1. **Start all services**:
    ```powershell
    docker-compose up -d
    ```
 
-   This will start:
-   - Elasticsearch (port 9200)
-   - API Server (port 8000)
-   - Kibana (port 5601) - optional
+   This starts:
+   - **Elasticsearch** (port 9200) - Job storage and search
+   - **API Server** (port 8000) - REST API with scheduler
+   - **Kibana** (port 5601) - Optional visualization
 
-2. **Access the API**:
-   - Swagger UI: http://localhost:8000/docs
-   - ReDoc: http://localhost:8000/redoc
-   - Kibana: http://localhost:5601 (if enabled)
+2. **Access the services**:
+   - **API Documentation**: http://localhost:8000/docs
+   - **Health Check**: http://localhost:8000/health
+   - **Kibana Dashboard**: http://localhost:5601
 
-3. **Start with Kibana** (optional):
+3. **Scheduler auto-starts**:
+   - Runs every Monday at 9:00 AM
+   - Scrapes 120 jobs (6 roles × 20 jobs each)
+   - Approximately 18-20 minutes per run
+   - Check status: `GET http://localhost:8000/api/v1/scheduler/status`
+
+### Local Development
+
+1. **Setup environment**:
    ```powershell
-   docker-compose --profile with-kibana up -d
-   ```
-
-### Option 2: Local Development
-
-1. **Clone and setup**:
-   ```powershell
-   cd "c:\Users\Chamika\Desktop\Research\LinkedIn Job Scrape Sheduller"
    python -m venv venv
-
+   venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
-2. **Start Elasticsearch** (using Docker):
+2. **Start Elasticsearch**:
    ```powershell
    docker-compose up -d elasticsearch
    ```
 
-3. **Start the API server**:
+3. **Run the API**:
    ```powershell
    python main.py
    ```
@@ -134,41 +136,42 @@ GET http://localhost:8000/api/v1/elasticsearch/stats
 ```
 LinkedIn Job Scrape Sheduller/
 ├── api/
-│   ├── main.py                    # FastAPI application
+│   ├── main.py                      # FastAPI application entry
 │   ├── core/
-│   │   ├── config.py             # Configuration settings
-│   │   └── elasticsearch_config.py
+│   │   ├── config.py                # Application configuration
+│   │   └── elasticsearch_config.py  # Elasticsearch connection
 │   ├── models/
-│   │   └── schemas.py            # Pydantic models
+│   │   └── schemas.py               # Pydantic data models
 │   ├── routes/
-│   │   ├── scraping.py           # Scraping endpoints
-│   │   ├── scheduler.py          # Scheduler endpoints
-│   │   ├── elasticsearch.py      # Elasticsearch endpoints
-│   │   ├── download.py           # File download endpoints
-│   │   └── health.py             # Health check
+│   │   ├── scraping.py              # Job scraping endpoints
+│   │   ├── scheduler.py             # Scheduler control endpoints
+│   │   ├── elasticsearch.py         # Search & analytics endpoints
+│   │   ├── download.py              # Export endpoints (CSV/JSON/Excel)
+│   │   └── health.py                # Health check endpoint
 │   ├── services/
-│   │   ├── scraper_service.py    # Scraping logic
-│   │   ├── scheduler_service.py  # Scheduling logic
-│   │   └── elasticsearch_service.py
+│   │   ├── scraper_service.py       # Scraping business logic
+│   │   ├── scheduler_service.py     # Automated scheduling (role tagging)
+│   │   └── elasticsearch_service.py # Elasticsearch operations
 │   └── utils/
-│       └── job_filter.py         # Job filtering utilities
+│       └── job_filter.py            # Job filtering utilities
 ├── scrapers/
-│   ├── beautifulsoup_scraper.py  # BeautifulSoup implementation
-│   ├── selenium_scraper.py       # Selenium implementation
-│   └── utils.py                  # Utility functions
-├── output/                       # Scraped data output
-├── docker-compose.yml            # Docker services configuration
-├── Dockerfile                    # API container
-├── main.py                       # Application entry point
-├── requirements.txt              # Python dependencies
-└── README.md                     # This file
+│   ├── beautifulsoup_scraper.py     # BeautifulSoup scraper (400+ skills)
+│   ├── selenium_scraper.py          # Selenium scraper (dynamic content)
+│   └── utils.py                     # Scraper utility functions
+├── output/                          # Local file exports
+├── docker-compose.yml               # Docker orchestration
+├── Dockerfile                       # API container definition
+├── main.py                          # Application launcher
+├── requirements.txt                 # Python dependencies
+├── SCHEDULER_QUICK_REFERENCE.md     # Scheduler usage guide
+└── README.md                        # Documentation (this file)
 ```
 
 ## ⚙️ Configuration
 
 ### Environment Variables
 
-Create a `.env` file or set environment variables:
+Create a `.env` file in the project root:
 
 ```env
 # API Configuration
@@ -177,46 +180,65 @@ PORT=8000
 APP_VERSION=2.0.0
 
 # Scheduler Configuration
-AUTO_START_SCHEDULER=True
-SCHEDULER_DAY=monday
-SCHEDULER_TIME=09:00
+AUTO_START_SCHEDULER=True          # Auto-start scheduler on API launch
+SCHEDULER_DAY=monday                # Day of week (monday, tuesday, etc.)
+SCHEDULER_TIME=09:00                # Time in 24-hour format (HH:MM)
 
 # Job Configuration
-JOBS_PER_ROLE=20
-MAX_POST_AGE_DAYS=21
-EXACT_MATCH=True
-FETCH_DETAILS=True
+JOBS_PER_ROLE=20                    # Jobs to scrape per role
+MAX_POST_AGE_DAYS=21                # Only jobs posted within last 21 days
+EXACT_MATCH=True                    # Exact job title matching
+FETCH_DETAILS=True                  # Fetch full job descriptions
 
 # Elasticsearch Configuration
 ELASTICSEARCH_ENABLED=True
-ELASTICSEARCH_HOST=localhost
+ELASTICSEARCH_HOST=elasticsearch    # Use 'localhost' for local dev
 ELASTICSEARCH_PORT=9200
 ELASTICSEARCH_INDEX=linkedin_jobs
 
-# Location Priority
+# Location Priority (Sri Lanka primary, USA/India/UK fallback)
 PRIMARY_LOCATION=Sri Lanka
 PRIMARY_COUNTRY_CODE=LK
 FALLBACK_LOCATIONS=United States,India,United Kingdom
 FALLBACK_COUNTRY_CODES=US,IN,GB
 ```
 
-### Scheduler Configuration
+### Scheduler Settings
 
-The scheduler supports:
-- **Days**: monday, tuesday, wednesday, thursday, friday, saturday, sunday
-- **Time**: 24-hour format (HH:MM), e.g., "09:00", "14:30"
+**Supported Schedule Days**:
+- `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`, `sunday`
+- `daily` (runs every day)
 
-### Job Roles
+**Time Format**: 24-hour format (e.g., `09:00`, `14:30`, `23:45`)
 
-Default job roles scraped by scheduler:
-- Software Engineer
-- DevOps Engineer
-- Data Scientist
-- ML Engineer
-- Frontend Developer
-- Backend Developer
-- Full Stack Developer
-- QA Engineer
+**Default Schedule**: Every Monday at 9:00 AM
+
+### Job Roles & Unique Identifiers
+
+The scheduler scrapes 6 job roles with unique tagging system:
+
+| Role | Tag | ID Format | Variations | Jobs Per Run |
+|------|-----|-----------|------------|--------------|
+| AI/ML Engineer | `AIML` | `AIML_001`, `AIML_002`, ... | AI/ML Engineer, Machine Learning Engineer, AI Engineer, ML Engineer | 20 |
+| Data Analyst | `DA` | `DA_001`, `DA_002`, ... | Data Analyst | 20 |
+| Data Engineer | `DE` | `DE_001`, `DE_002`, ... | Data Engineer | 20 |
+| DevOps Engineer | `DO` | `DO_001`, `DO_002`, ... | DevOps Engineer, Dev Ops Engineer | 20 |
+| Web Developer | `WD` | `WD_001`, `WD_002`, ... | Web Developer | 20 |
+| Software Engineer | `SE` | `SE_001`, `SE_002`, ... | Software Engineer | 20 |
+
+**Total**: 120 jobs per scheduled run
+
+#### Job Metadata Fields
+Each scraped job includes:
+- **role_tag**: Short role identifier (`DA`, `SE`, `AIML`, etc.)
+- **role_key**: Internal role category (`data_analyst`, `software_engineer`, etc.)
+- **job_role_id**: Unique sequential ID per role (`DA_001`, `SE_042`, `AIML_015`)
+
+#### ID Generation
+- IDs reset with each scraping run
+- Sequential numbering per role (001, 002, 003, ...)
+- Format: `{TAG}_{counter:03d}`
+- Example sequence for Data Analyst: `DA_001`, `DA_002`, ..., `DA_020`
 
 ## 🐳 Docker Deployment
 
@@ -315,32 +337,58 @@ print(f"Total jobs: {stats['total_jobs']}")
 
 ## 🔧 Advanced Features
 
-### Skills Extraction
+### 400+ Skills Extraction
 
-Automatically extracts skills from job descriptions:
-- Programming languages (Python, Java, JavaScript, etc.)
-- Frameworks (React, Django, TensorFlow, etc.)
-- Tools (Docker, Kubernetes, Git, etc.)
-- Databases (PostgreSQL, MongoDB, Redis, etc.)
-- Cloud platforms (AWS, Azure, GCP)
+Comprehensive skill detection from job descriptions:
+
+**Data Engineering**: PySpark, Spark SQL, Apache Kafka, Azure Synapse, Microsoft Fabric, OneLake, SSIS, Databricks, Data Factory, Informatica
+
+**Cloud Platforms**: AWS (S3, Lambda, EC2, RDS, Redshift), Azure (Blob Storage, Data Lake, Synapse, Purview), GCP (BigQuery, Cloud Storage)
+
+**Programming**: Python, Java, JavaScript, TypeScript, C++, C#, Go, Rust, Scala, R, SQL
+
+**Databases**: PostgreSQL, MySQL, MongoDB, Redis, Cassandra, Elasticsearch, DynamoDB, Snowflake
+
+**DevOps & Tools**: Docker, Kubernetes, Jenkins, GitLab CI, Terraform, Ansible, Prometheus, Grafana
+
+**BI & Analytics**: Tableau, Power BI, Looker, Metabase, Superset
+
+**Frameworks**: React, Angular, Vue.js, Django, Flask, FastAPI, Spring Boot, Node.js, TensorFlow, PyTorch
+
+**Testing**: Pytest, Jest, Selenium, Cypress, JUnit
+
+**Methodologies**: Agile, Scrum, CI/CD, DevOps, Test-Driven Development
 
 ### Top Skills Analysis
 
-Find most demanded skills by job role:
+Find most demanded skills by role:
 ```bash
 GET /api/v1/elasticsearch/top-skills/{job_role}?top_n=20
 ```
 
-### Exact Match Filtering
+Returns frequency analysis across all jobs for that role.
 
-Enable `EXACT_MATCH=True` to only include jobs with exact title matches (e.g., "Software Engineer" won't match "Senior Software Engineer").
+### Smart Job Filtering
 
-### Location Priority
+**Deduplication**: Removes duplicate jobs by company + title + location
 
-Configure primary and fallback locations:
-- Primary location searched first
-- Fallback locations used if insufficient results
-- Separate country codes for better targeting
+**Recency Filter**: Only includes jobs posted within last 21 days
+
+**Exact Match**: When enabled, "Software Engineer" won't match "Senior Software Engineer"
+
+**Location Priority**:
+1. Primary: Sri Lanka (up to 20 jobs)
+2. Fallback: USA (up to 7), India (up to 7), UK (up to 6)
+3. Fills to exactly 20 jobs per role
+
+### Role-Based Tagging
+
+Every job gets three identifiers:
+- `role_tag`: Short code (DA, SE, AIML, etc.)
+- `role_key`: Full category (data_analyst, software_engineer, etc.)
+- `job_role_id`: Unique ID (DA_001, SE_042, AIML_015, etc.)
+
+Sequential numbering resets with each scraping run.
 
 ## 🔍 Monitoring & Management
 
@@ -432,29 +480,89 @@ docker-compose build --no-cache
 docker-compose logs
 ```
 
+## 📊 Scheduler Workflow
+
+### What Happens Every Monday at 9:00 AM?
+
+1. **Initialize**: Scheduler triggers, resets job counters
+2. **Scrape 6 Roles**: Each with variations (AI/ML Engineer, Data Analyst, etc.)
+3. **Multi-Location Scraping**:
+   - Primary: Sri Lanka (~30 jobs per role)
+   - Fallback: USA, India, UK (~10 jobs each per role)
+4. **Filter & Prioritize**:
+   - Remove duplicates (company + title + location)
+   - Keep only recent jobs (≤21 days old)
+   - Prioritize Sri Lanka jobs
+   - Select exactly 20 jobs per role
+5. **Tag & Identify**: Assign role_tag and job_role_id
+6. **Save to Elasticsearch**: Store all 120 jobs with metadata
+7. **Complete**: ~18-20 minutes total
+
+### Expected Results Per Run
+
+- **Total Jobs**: 120
+- **By Role**: 20 each (AIML, DA, DE, DO, WD, SE)
+- **By Country** (approx): LK: 45, US: 35, IN: 30, GB: 10
+
+See **SCHEDULER_QUICK_REFERENCE.md** for detailed scheduler guide.
+
 ## 📄 API Documentation
 
-Full API documentation available at:
+**Interactive Documentation**:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI JSON**: http://localhost:8000/openapi.json
+- **OpenAPI Spec**: http://localhost:8000/openapi.json
+
+**Key Endpoints**:
+- `GET /health` - Health check
+- `POST /api/v1/scrape/sync` - Scrape jobs immediately
+- `GET /api/v1/scheduler/status` - Check scheduler status
+- `POST /api/v1/scheduler/run-now` - Trigger manual run
+- `GET /api/v1/elasticsearch/search` - Search jobs
+- `GET /api/v1/elasticsearch/top-skills/{role}` - Get top skills
+
+## 🚀 Deployment Options
+
+### Cloud Deployment (24/7 Operation)
+
+1. **Railway.app** (Easiest):
+   - Connect GitHub repository
+   - Auto-deploys on push
+   - Free tier available
+
+2. **AWS EC2** (Production):
+   - Deploy Docker containers
+   - Use managed Elasticsearch service
+   - Set up auto-scaling
+
+3. **DigitalOcean/Azure/GCP**: Similar Docker deployment
+
+### Local Deployment
+
+Keep laptop running with Docker or deploy to home server.
 
 ## 🤝 Contributing
 
-This is a research project. Feel free to fork and modify for your needs.
+This is a research project under Industry-Academia-SkillBridge-Research organization.
 
 ## 📝 License
 
-This project is for educational and research purposes only. Use responsibly and ensure compliance with LinkedIn's Terms of Service.
+Educational and research use only. Respect LinkedIn's Terms of Service and robots.txt.
 
 ## 📧 Support
 
-For issues or questions, please check:
-1. API documentation at `/docs`
-2. Docker logs: `docker-compose logs`
-3. Elasticsearch status: `/api/v1/elasticsearch/status`
+**Documentation**:
+- `README.md` - This file
+- `SCHEDULER_QUICK_REFERENCE.md` - Scheduler usage guide
+- API Docs - http://localhost:8000/docs
+
+**Troubleshooting**:
+1. Check API logs: `docker-compose logs scraper-api`
+2. Check Elasticsearch: `GET /api/v1/elasticsearch/status`
+3. Check scheduler: `GET /api/v1/scheduler/status`
 
 ---
 
 **Version**: 2.0.0  
+**Repository**: [LinkedIn-Job-Scrape-Scheduler](https://github.com/Industry-Academia-SkillBridge-Research/LinkedIn-Job-Scrape-Scheduler)  
 **Last Updated**: November 2025

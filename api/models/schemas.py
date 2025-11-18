@@ -72,6 +72,9 @@ class JobResponse(BaseModel):
     description: Optional[str] = None
     criteria: Optional[Dict[str, str]] = None
     skills: Optional[List[str]] = None
+    role_tag: Optional[str] = Field(None, description="Role tag identifier (e.g., DA, SE, AIML)")
+    role_key: Optional[str] = Field(None, description="Role category key (e.g., data_analyst, software_engineer)")
+    job_role_id: Optional[str] = Field(None, description="Unique job role identifier (e.g., DA_001, SE_042)")
     
     class Config:
         json_schema_extra = {
@@ -88,7 +91,10 @@ class JobResponse(BaseModel):
                     "Seniority level": "Mid-Senior level",
                     "Employment type": "Full-time"
                 },
-                "skills": ["Python", "SQL", "Tableau"]
+                "skills": ["Python", "SQL", "Tableau"],
+                "role_tag": "DA",
+                "role_key": "data_analyst",
+                "job_role_id": "DA_001"
             }
         }
 

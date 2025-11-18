@@ -318,43 +318,149 @@ class LinkedInScraperSelenium:
         """
         import re
         
-        # Common technical skills to look for
+        # Comprehensive technical skills to look for (same as BeautifulSoup scraper)
         common_skills = [
             # Programming Languages
             'Python', 'Java', 'JavaScript', 'TypeScript', 'C++', 'C#', 'Ruby', 'PHP', 
-            'Go', 'Rust', 'Swift', 'Kotlin', 'Scala', 'R', 'MATLAB', 'SQL',
+            'Go', 'Rust', 'Swift', 'Kotlin', 'Scala', 'R', 'MATLAB', 'SQL', 'Perl',
+            'Bash', 'PowerShell', 'VBA', 'Julia', 'Dart', 'Elixir', 'Clojure',
+            'Groovy', 'Lua', 'Haskell', 'Erlang', 'F#', 'Objective-C',
             
             # Web Technologies
             'HTML', 'CSS', 'React', 'Angular', 'Vue.js', 'Node.js', 'Django', 'Flask',
-            'Express.js', 'Spring Boot', 'ASP.NET', 'Laravel', 'Rails',
+            'Express.js', 'Spring Boot', 'ASP.NET', 'Laravel', 'Rails', 'Next.js',
+            'Nuxt.js', 'Svelte', 'Ember.js', 'Backbone.js', 'jQuery', 'Bootstrap',
+            'Tailwind CSS', 'Material UI', 'Redux', 'MobX', 'GraphQL', 'REST API',
+            'WebSocket', 'gRPC', 'SOAP', 'Fastify', 'NestJS', 'Meteor',
             
             # Data Science & ML
             'Machine Learning', 'Deep Learning', 'TensorFlow', 'PyTorch', 'Keras',
             'Scikit-learn', 'Pandas', 'NumPy', 'Data Analysis', 'Statistics',
-            'NLP', 'Computer Vision', 'Neural Networks',
+            'NLP', 'Computer Vision', 'Neural Networks', 'MLflow', 'Kubeflow',
+            'XGBoost', 'LightGBM', 'CatBoost', 'NLTK', 'spaCy', 'Hugging Face',
+            'OpenCV', 'YOLO', 'CNN', 'RNN', 'LSTM', 'Transformer', 'BERT', 'GPT',
+            'Reinforcement Learning', 'Feature Engineering', 'Model Deployment',
+            'A/B Testing', 'Jupyter', 'Matplotlib', 'Seaborn', 'Plotly',
             
             # Databases
             'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Oracle', 'SQL Server',
-            'Cassandra', 'DynamoDB', 'Elasticsearch', 'Neo4j',
+            'Cassandra', 'DynamoDB', 'Elasticsearch', 'Neo4j', 'MariaDB',
+            'CouchDB', 'Firebase', 'Firestore', 'RocksDB', 'InfluxDB', 'TimescaleDB',
+            'Snowflake', 'BigQuery', 'Redshift', 'Databricks', 'Teradata',
+            'Vertica', 'Greenplum', 'ClickHouse', 'ScyllaDB', 'CockroachDB',
+            'NoSQL', 'NewSQL', 'ACID', 'CAP Theorem', 'Data Modeling',
+            'Database Design', 'Query Optimization', 'Indexing', 'Sharding',
             
-            # Cloud & DevOps
-            'AWS', 'Azure', 'Google Cloud', 'GCP', 'Docker', 'Kubernetes', 'Jenkins',
-            'CI/CD', 'Terraform', 'Ansible', 'Linux', 'Git', 'GitHub', 'GitLab',
+            # Cloud Platforms & Services
+            'AWS', 'Azure', 'Google Cloud', 'GCP', 'IBM Cloud', 'Oracle Cloud',
+            'DigitalOcean', 'Linode', 'Heroku', 'Netlify', 'Vercel', 'Cloudflare',
+            'EC2', 'S3', 'Lambda', 'RDS', 'CloudFormation', 'CloudWatch',
+            'Azure DevOps', 'Azure Functions', 'Azure Storage', 'Azure AD',
+            'Azure Synapse', 'Azure Data Factory', 'Data Factory', 'Azure Data Lake', 'Data Lake',
+            'Microsoft Fabric', 'OneLake', 'Lakehouse', 'Delta Lake',
+            'Google Kubernetes Engine', 'Cloud Run', 'Cloud Functions',
+            'Cloud Storage', 'Cloud SQL', 'Cloud Pub/Sub', 'Dataflow',
+            'Cloud Composer', 'Cloud Build', 'App Engine', 'Compute Engine',
             
-            # Data Tools
-            'Tableau', 'Power BI', 'Looker', 'Apache Spark', 'Hadoop', 'Kafka',
-            'Airflow', 'ETL', 'Data Warehousing', 'Big Data',
+            # DevOps & Infrastructure
+            'Docker', 'Kubernetes', 'Jenkins', 'CI/CD', 'Terraform', 'Ansible',
+            'Chef', 'Puppet', 'Vagrant', 'Packer', 'Consul', 'Vault',
+            'Linux', 'Unix', 'Ubuntu', 'CentOS', 'Red Hat', 'Debian',
+            'Git', 'GitHub', 'GitLab', 'Bitbucket', 'SVN', 'Mercurial',
+            'CircleCI', 'Travis CI', 'GitHub Actions', 'GitLab CI', 'Azure Pipelines',
+            'Bamboo', 'TeamCity', 'Octopus Deploy', 'Spinnaker', 'ArgoCD',
+            'Helm', 'Istio', 'Prometheus', 'Grafana', 'ELK Stack', 'Datadog',
+            'New Relic', 'Splunk', 'Nagios', 'Zabbix', 'PagerDuty',
+            'Infrastructure as Code', 'IaC', 'GitOps', 'Container Orchestration',
+            'Service Mesh', 'Load Balancing', 'Auto Scaling', 'High Availability',
             
-            # Testing
+            # Data Engineering & ETL
+            'Apache Spark', 'PySpark', 'Spark SQL', 'Spark Streaming',
+            'Hadoop', 'HDFS', 'MapReduce', 'Hive', 'Pig', 'HBase',
+            'Kafka', 'Apache Flink', 'Apache Storm', 'Apache Beam',
+            'Airflow', 'Luigi', 'Prefect', 'Dagster', 'dbt', 'Matillion',
+            'Talend', 'Informatica', 'DataStage', 'SSIS', 'AWS Glue',
+            'ETL', 'ELT', 'Data Pipeline', 'Data Warehousing', 'Big Data',
+            'Data Integration', 'Data Migration', 'Data Transformation',
+            'Data Lake', 'Data Mesh', 'Data Governance', 'Data Quality',
+            'Data Catalog', 'Data Lineage', 'Master Data Management', 'MDM',
+            'Stream Processing', 'Batch Processing', 'Real-time Processing',
+            'Data Orchestration', 'Workflow Orchestration',
+            
+            # BI & Analytics
+            'Tableau', 'Power BI', 'Looker', 'Qlik', 'MicroStrategy', 'SAP BI',
+            'Google Data Studio', 'Metabase', 'Superset', 'Redash', 'Mode Analytics',
+            'Sisense', 'Domo', 'Pentaho', 'Business Intelligence', 'Data Visualization',
+            'Dashboarding', 'Reporting', 'KPI', 'Metrics', 'Analytics',
+            
+            # Testing & QA
             'Selenium', 'Jest', 'Pytest', 'JUnit', 'TestNG', 'Cypress',
+            'Mocha', 'Chai', 'Jasmine', 'Karma', 'Protractor', 'Puppeteer',
+            'Playwright', 'Appium', 'TestCafe', 'Robot Framework', 'Cucumber',
+            'BDD', 'TDD', 'Unit Testing', 'Integration Testing', 'E2E Testing',
+            'Performance Testing', 'Load Testing', 'JMeter', 'Gatling', 'Locust',
+            'Postman', 'SoapUI', 'RestAssured', 'Test Automation', 'QA',
+            
+            # Mobile Development
+            'iOS', 'Android', 'React Native', 'Flutter', 'Xamarin', 'Ionic',
+            'SwiftUI', 'Jetpack Compose', 'Kotlin Multiplatform', 'Cordova',
+            'Mobile Development', 'App Development', 'Cross-platform',
+            
+            # Security
+            'Cybersecurity', 'Information Security', 'Application Security', 'Network Security',
+            'Penetration Testing', 'Ethical Hacking', 'OWASP', 'SSL/TLS', 'OAuth',
+            'JWT', 'SAML', 'IAM', 'Zero Trust', 'Vulnerability Assessment',
+            'Security Auditing', 'Compliance', 'GDPR', 'SOC 2', 'ISO 27001',
+            'Encryption', 'Cryptography', 'Firewalls', 'VPN', 'SIEM', 'IDS/IPS',
+            
+            # Methodologies & Practices
+            'Agile', 'Scrum', 'Kanban', 'Lean', 'SAFe', 'DevOps', 'DataOps',
+            'MLOps', 'AIOps', 'SRE', 'Site Reliability Engineering',
+            'Continuous Integration', 'Continuous Deployment', 'Continuous Delivery',
+            'Test Driven Development', 'Behavior Driven Development',
+            'Domain Driven Design', 'Microservices', 'Monolithic Architecture',
+            'Event Driven Architecture', 'Serverless', 'API First', 'Cloud Native',
+            'Twelve Factor App', 'Design Patterns', 'SOLID Principles',
+            'Clean Code', 'Code Review', 'Pair Programming', 'Mob Programming',
+            
+            # Project Management & Collaboration
+            'JIRA', 'Confluence', 'Trello', 'Asana', 'Monday.com', 'Basecamp',
+            'Slack', 'Microsoft Teams', 'Zoom', 'Miro', 'Figma', 'Sketch',
+            'Adobe XD', 'InVision', 'Notion', 'SharePoint', 'Microsoft Project',
+            'Project Management', 'Product Management', 'Requirements Gathering',
+            'Stakeholder Management', 'Sprint Planning', 'Retrospective',
             
             # Soft Skills
-            'Communication', 'Leadership', 'Problem Solving', 'Teamwork',
-            'Project Management', 'Agile', 'Scrum', 'Analytical Skills',
+            'Communication', 'Leadership', 'Problem Solving', 'Problem-Solving', 'Critical Thinking',
+            'Teamwork', 'Collaboration', 'Time Management', 'Adaptability',
+            'Analytical Skills', 'Attention to Detail', 'Creativity', 'Innovation',
+            'Decision Making', 'Conflict Resolution', 'Mentoring', 'Coaching',
+            'Presentation Skills', 'Technical Writing', 'Documentation',
+            'Customer Service', 'Client Relations', 'Interpersonal Skills',
             
-            # Other
-            'REST API', 'GraphQL', 'Microservices', 'Blockchain', 'IoT',
-            'Cybersecurity', 'UI/UX', 'Excel', 'JIRA', 'Confluence'
+            # Other Technologies
+            'Blockchain', 'Ethereum', 'Solidity', 'Smart Contracts', 'Web3',
+            'IoT', 'Edge Computing', 'Embedded Systems', 'Arduino', 'Raspberry Pi',
+            'Computer Networks', 'TCP/IP', 'DNS', 'HTTP/HTTPS', 'Networking',
+            'Version Control', 'Code Versioning', 'Branching Strategy',
+            'UI/UX', 'User Experience', 'User Interface', 'Wireframing', 'Prototyping',
+            'Excel', 'Google Sheets', 'VBA', 'Macros', 'Pivot Tables',
+            'SAP', 'Salesforce', 'ServiceNow', 'Workday', 'Oracle EBS',
+            'ERP', 'CRM', 'HRM', 'Supply Chain Management', 'E-commerce',
+            'Content Management System', 'CMS', 'WordPress', 'Drupal', 'Shopify',
+            'Video Editing', 'Audio Processing', 'Image Processing', 'FFmpeg',
+            'OpenGL', 'DirectX', 'Unity', 'Unreal Engine', 'Game Development',
+            'AR', 'VR', 'Augmented Reality', 'Virtual Reality', 'Mixed Reality',
+            'Quantum Computing', 'Edge AI', 'AutoML', 'MLaaS',
+            'API Gateway', 'Service Discovery', 'Circuit Breaker', 'Message Queue',
+            'RabbitMQ', 'ActiveMQ', 'ZeroMQ', 'MQTT', 'AMQP', 'WebHooks',
+            'Scrapy', 'Beautiful Soup', 'Web Scraping', 'Data Mining',
+            'Text Mining', 'Sentiment Analysis', 'Recommendation Systems',
+            'Search Engine', 'Solr', 'Lucene', 'Algolia', 'Elasticsearch',
+            'CDN', 'Content Delivery Network', 'Edge Network', 'Caching',
+            'Memcached', 'Varnish', 'HAProxy', 'Nginx', 'Apache', 'IIS',
+            'Serverless Computing', 'FaaS', 'Function as a Service',
+            'Containerization', 'Virtualization', 'VMware', 'Hyper-V', 'KVM',
         ]
         
         found_skills = []

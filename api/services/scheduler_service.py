@@ -38,6 +38,16 @@ class SchedulerConfig:
         "software_engineer": ["Software Engineer"]
     }
     
+    # Role tags for unique job identification
+    ROLE_TAGS = {
+        "ai_ml_engineer": "AIML",
+        "data_analyst": "DA",
+        "data_engineer": "DE",
+        "devops_engineer": "DO",
+        "web_developer": "WD",
+        "software_engineer": "SE"
+    }
+    
     # Location priority configuration
     # First priority: Sri Lanka (20 jobs target)
     # Fallback: USA, India, UK
@@ -89,6 +99,31 @@ class JobScheduler:
             "errors": []
         }
         self.seen_job_ids: Set[str] = set()  # For deduplication
+        self.role_job_counters: Dict[str, int] = {role: 0 for role in SchedulerConfig.ROLE_TAGS.keys()}  # Counter per role
+    
+    def generate_job_role_id(self, role_key: str) -> str:
+        """
+        Generate a unique job_role_id with role tag
+        Format: {ROLE_TAG}_{counter}
+        Example: DA_001, SE_042, AIML_015
+        """
+        self.role_job_counters[role_key] += 1
+        role_tag = SchedulerConfig.ROLE_TAGS.get(role_key, "UNK")
+        counter = self.role_job_counters[role_key]
+        return f"{role_tag}_{counter:03d}"
+    
+    def get_role_key_from_title(self, job_title: str) -> Optional[str]:
+        """
+        Determine which role category a job belongs to based on its title
+        """
+        job_title_lower = job_title.lower().strip()
+        
+        for role_key, variations in SchedulerConfig.JOB_ROLES.items():
+            for variation in variations:
+                if variation.lower() in job_title_lower:
+                    return role_key
+        
+        return None
     
     def normalize_job_id(self, job: Dict) -> str:
         """
@@ -161,13 +196,22 @@ class JobScheduler:
         2. Recency (21 days)
         3. Location priority (Sri Lanka first, then USA, India, UK)
         4. Limit to 20 jobs total per role
+        5. Add role_tag and job_role_id to each job
         """
-        # Step 1: Deduplicate
+        # Step 1: Deduplicate and add role metadata
         unique_jobs = []
+        role_tag = SchedulerConfig.ROLE_TAGS.get(role_key, "UNK")
+        
         for job in jobs:
             job_id = self.normalize_job_id(job)
             if job_id not in self.seen_job_ids:
                 self.seen_job_ids.add(job_id)
+                
+                # Add role_tag and generate job_role_id
+                job['role_tag'] = role_tag
+                job['role_key'] = role_key
+                job['job_role_id'] = self.generate_job_role_id(role_key)
+                
                 unique_jobs.append(job)
         
         logger.info(f"   After deduplication: {len(unique_jobs)} unique jobs")
@@ -317,6 +361,8 @@ class JobScheduler:
         }
         
         self.seen_job_ids.clear()  # Reset deduplication
+        # Reset role counters for new scraping run
+        self.role_job_counters = {role: 0 for role in SchedulerConfig.ROLE_TAGS.keys()}
         all_jobs = []
         total_roles = len(SchedulerConfig.JOB_ROLES)
         

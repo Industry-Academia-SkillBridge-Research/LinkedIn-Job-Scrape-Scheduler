@@ -66,6 +66,31 @@ class ScraperService:
             return True
         return False
     
+    def get_role_tag_from_keywords(self, keywords: str) -> tuple[str, str]:
+        """
+        Determine role_tag and role_key from keywords
+        Returns (role_tag, role_key)
+        """
+        keywords_lower = keywords.lower().strip()
+        
+        # Role mappings
+        role_mapping = {
+            "ai_ml_engineer": (["ai/ml engineer", "machine learning engineer", "ai engineer", "ml engineer", "artificial intelligence"], "AIML"),
+            "data_analyst": (["data analyst"], "DA"),
+            "data_engineer": (["data engineer"], "DE"),
+            "devops_engineer": (["devops engineer", "dev ops engineer"], "DO"),
+            "web_developer": (["web developer"], "WD"),
+            "software_engineer": (["software engineer"], "SE")
+        }
+        
+        for role_key, (variations, role_tag) in role_mapping.items():
+            for variation in variations:
+                if variation in keywords_lower:
+                    return role_tag, role_key
+        
+        # Default if no match
+        return "GEN", "general"
+    
     def scrape_jobs(self, request: JobSearchRequest) -> List[Dict]:
         """
         Execute the scraping operation
@@ -117,6 +142,14 @@ class ScraperService:
                 
                 # Limit to requested count
                 jobs = filtered_jobs[:request.max_jobs]
+            
+            # Add role_tag and job_role_id to each job
+            role_tag, role_key = self.get_role_tag_from_keywords(request.keywords)
+            
+            for idx, job in enumerate(jobs, start=1):
+                job['role_tag'] = role_tag
+                job['role_key'] = role_key
+                job['job_role_id'] = f"{role_tag}_{idx:03d}"
             
             return jobs
             
