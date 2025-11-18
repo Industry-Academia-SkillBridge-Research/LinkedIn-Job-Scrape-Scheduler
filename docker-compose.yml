@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # Elasticsearch Service
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: linkedin-elasticsearch
+    environment:
+      # Single-node cluster (for development/small scale)
+      - discovery.type=single-node
+      # Disable security for simplicity (enable in production!)
+      - xpack.security.enabled=false
+      # Memory settings (adjust based on your system)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # Disable ML features to save resources
+      - xpack.ml.enabled=false
+      - cluster.name=linkedin-jobs-cluster
+      - node.name=linkedin-jobs-node
+    ports:
+      # Expose Elasticsearch on port 9200
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      # Persist Elasticsearch data
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - linkedin-scraper-network
+    restart: unless-stopped  # Auto-restart on failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # LinkedIn Scraper API Service
+  scraper-api:
+    build: .
+    container_name: linkedin-scraper-api
+    ports:
+      # Expose API on port 8000
+      - "8000:8000"
+    environment:
+      # Scheduler Configuration
+      - AUTO_START_SCHEDULER=True
+      - SCHEDULER_DAY=monday
+      - SCHEDULER_TIME=09:00
+      
+      # Job Configuration
+      - JOBS_PER_ROLE=20
+      - MAX_POST_AGE_DAYS=21
+      - EXACT_MATCH=True
+      - FETCH_DETAILS=True
+      
+      # Elasticsearch Configuration
+      - ELASTICSEARCH_ENABLED=True
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+      - ELASTICSEARCH_SCHEME=http
+      - ELASTICSEARCH_INDEX=linkedin_jobs
+      
+      # Location Priority
+      - PRIMARY_LOCATION=Sri Lanka
+      - PRIMARY_COUNTRY_CODE=LK
+      - FALLBACK_LOCATIONS=United States,India,United Kingdom
+      - FALLBACK_COUNTRY_CODES=US,IN,GB
+      
+      # Server Configuration
+      - HOST=0.0.0.0
+      - PORT=8000
+      - RELOAD=False
+      
+      # API Configuration
+      - APP_NAME=LinkedIn Job Scraper API
+      - APP_VERSION=2.0.0
+      - API_V1_PREFIX=/api/v1
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - linkedin-scraper-network
+    restart: unless-stopped  # Auto-restart on failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Optional: Kibana for Elasticsearch visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    container_name: linkedin-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - SERVER_HOST=0.0.0.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - linkedin-scraper-network
+    restart: unless-stopped
+    profiles:
+      - with-kibana  # Only start if explicitly requested
+
+# Named volumes for data persistence
+volumes:
+  elasticsearch_data:
+    driver: local
+
+# Network for services to communicate
+networks:
+  linkedin-scraper-network:
+    driver: bridge
