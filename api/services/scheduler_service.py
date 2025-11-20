@@ -103,14 +103,16 @@ class JobScheduler:
     
     def generate_job_role_id(self, role_key: str) -> str:
         """
-        Generate a unique job_role_id with role tag
-        Format: {ROLE_TAG}_{counter}
-        Example: DA_001, SE_042, AIML_015
+        Generate a globally unique job_role_id with role tag and timestamp
+        Format: {ROLE_TAG}_{YYYYMMDD}_{counter}
+        Example: DA_20251119_001, SE_20251119_042, AIML_20251125_015
+        This ensures uniqueness across different scraping runs
         """
         self.role_job_counters[role_key] += 1
         role_tag = SchedulerConfig.ROLE_TAGS.get(role_key, "UNK")
         counter = self.role_job_counters[role_key]
-        return f"{role_tag}_{counter:03d}"
+        date_str = datetime.utcnow().strftime("%Y%m%d")
+        return f"{role_tag}_{date_str}_{counter:03d}"
     
     def get_role_key_from_title(self, job_title: str) -> Optional[str]:
         """

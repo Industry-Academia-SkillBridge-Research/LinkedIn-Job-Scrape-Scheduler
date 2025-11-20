@@ -143,13 +143,14 @@ class ScraperService:
                 # Limit to requested count
                 jobs = filtered_jobs[:request.max_jobs]
             
-            # Add role_tag and job_role_id to each job
+            # Add role_tag and job_role_id to each job with timestamp for uniqueness
             role_tag, role_key = self.get_role_tag_from_keywords(request.keywords)
+            date_str = datetime.utcnow().strftime("%Y%m%d")
             
             for idx, job in enumerate(jobs, start=1):
                 job['role_tag'] = role_tag
                 job['role_key'] = role_key
-                job['job_role_id'] = f"{role_tag}_{idx:03d}"
+                job['job_role_id'] = f"{role_tag}_{date_str}_{idx:03d}"
             
             return jobs
             

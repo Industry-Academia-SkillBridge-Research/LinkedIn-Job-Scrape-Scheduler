@@ -39,6 +39,12 @@ services:
     ports:
       # Expose API on port 8000
       - "8000:8000"
+    volumes:
+      # Mount local code for live updates (development)
+      - ./api:/app/api
+      - ./scrapers:/app/scrapers
+      - ./main.py:/app/main.py
+      - ./output:/app/output
     environment:
       # Scheduler Configuration
       - AUTO_START_SCHEDULER=True

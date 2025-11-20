@@ -47,14 +47,14 @@ curl http://localhost:8000/api/v1/scheduler/status
 
 ## 🎯 Job Roles & Tags
 
-| Role | Tag | Example IDs |
-|------|-----|-------------|
-| AI/ML Engineer | AIML | AIML_001, AIML_002, ..., AIML_020 |
-| Data Analyst | DA | DA_001, DA_002, ..., DA_020 |
-| Data Engineer | DE | DE_001, DE_002, ..., DE_020 |
-| DevOps Engineer | DO | DO_001, DO_002, ..., DO_020 |
-| Web Developer | WD | WD_001, WD_002, ..., WD_020 |
-| Software Engineer | SE | SE_001, SE_002, ..., SE_020 |
+| Role | Tag | Example IDs (Nov 19, 2025) |
+|------|-----|--------------------------|
+| AI/ML Engineer | AIML | AIML_20251119_001, AIML_20251119_002, ..., AIML_20251119_020 |
+| Data Analyst | DA | DA_20251119_001, DA_20251119_002, ..., DA_20251119_020 |
+| Data Engineer | DE | DE_20251119_001, DE_20251119_002, ..., DE_20251119_020 |
+| DevOps Engineer | DO | DO_20251119_001, DO_20251119_002, ..., DO_20251119_020 |
+| Web Developer | WD | WD_20251119_001, WD_20251119_002, ..., WD_20251119_020 |
+| Software Engineer | SE | SE_20251119_001, SE_20251119_002, ..., SE_20251119_020 |
 
 ---
 
@@ -113,10 +113,10 @@ Each job includes:
   "company": "Tech Corp",
   "location": "Colombo, Sri Lanka",
   
-  // Role identifiers (NEW)
+  // Role identifiers (Globally Unique)
   "role_tag": "DA",
   "role_key": "data_analyst",
-  "job_role_id": "DA_001",
+  "job_role_id": "DA_20251119_001",  // Format: {TAG}_{YYYYMMDD}_{counter}
   
   // Job details
   "posted_date": "2025-11-18",
@@ -421,7 +421,7 @@ GET http://localhost:8000/api/v1/elasticsearch/search?size=1000
 ✓ Scrapes 6 roles, 20 jobs each = 120 total  
 ✓ Prioritizes Sri Lanka, falls back to USA/India/UK  
 ✓ Filters duplicates and old jobs (>21 days)  
-✓ Assigns unique IDs: DA_001, SE_042, AIML_015  
+✓ Assigns globally unique IDs: DA_20251119_001, SE_20251119_042, AIML_20251119_015  
 ✓ Saves to Elasticsearch for searching  
 ✓ Takes ~18-20 minutes to complete  
 ✓ Provides real-time progress via API  

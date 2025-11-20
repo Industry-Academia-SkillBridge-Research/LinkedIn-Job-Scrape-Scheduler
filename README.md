@@ -217,14 +217,14 @@ FALLBACK_COUNTRY_CODES=US,IN,GB
 
 The scheduler scrapes 6 job roles with unique tagging system:
 
-| Role | Tag | ID Format | Variations | Jobs Per Run |
-|------|-----|-----------|------------|--------------|
-| AI/ML Engineer | `AIML` | `AIML_001`, `AIML_002`, ... | AI/ML Engineer, Machine Learning Engineer, AI Engineer, ML Engineer | 20 |
-| Data Analyst | `DA` | `DA_001`, `DA_002`, ... | Data Analyst | 20 |
-| Data Engineer | `DE` | `DE_001`, `DE_002`, ... | Data Engineer | 20 |
-| DevOps Engineer | `DO` | `DO_001`, `DO_002`, ... | DevOps Engineer, Dev Ops Engineer | 20 |
-| Web Developer | `WD` | `WD_001`, `WD_002`, ... | Web Developer | 20 |
-| Software Engineer | `SE` | `SE_001`, `SE_002`, ... | Software Engineer | 20 |
+| Role | Tag | ID Format (Example) | Variations | Jobs Per Run |
+|------|-----|---------------------|------------|--------------|
+| AI/ML Engineer | `AIML` | `AIML_20251119_001`, `AIML_20251119_002` | AI/ML Engineer, Machine Learning Engineer, AI Engineer, ML Engineer | 20 |
+| Data Analyst | `DA` | `DA_20251119_001`, `DA_20251119_002` | Data Analyst | 20 |
+| Data Engineer | `DE` | `DE_20251119_001`, `DE_20251119_002` | Data Engineer | 20 |
+| DevOps Engineer | `DO` | `DO_20251119_001`, `DO_20251119_002` | DevOps Engineer, Dev Ops Engineer | 20 |
+| Web Developer | `WD` | `WD_20251119_001`, `WD_20251119_002` | Web Developer | 20 |
+| Software Engineer | `SE` | `SE_20251119_001`, `SE_20251119_002` | Software Engineer | 20 |
 
 **Total**: 120 jobs per scheduled run
 
@@ -232,13 +232,15 @@ The scheduler scrapes 6 job roles with unique tagging system:
 Each scraped job includes:
 - **role_tag**: Short role identifier (`DA`, `SE`, `AIML`, etc.)
 - **role_key**: Internal role category (`data_analyst`, `software_engineer`, etc.)
-- **job_role_id**: Unique sequential ID per role (`DA_001`, `SE_042`, `AIML_015`)
+- **job_role_id**: Globally unique ID with date (`DA_20251119_001`, `SE_20251119_042`, `AIML_20251125_015`)
 
 #### ID Generation
-- IDs reset with each scraping run
-- Sequential numbering per role (001, 002, 003, ...)
-- Format: `{TAG}_{counter:03d}`
-- Example sequence for Data Analyst: `DA_001`, `DA_002`, ..., `DA_020`
+- **Globally unique** across all scraping runs
+- Sequential numbering per role per day
+- Format: `{TAG}_{YYYYMMDD}_{counter:03d}`
+- Example for Nov 19, 2025: `DA_20251119_001`, `DA_20251119_002`, ..., `DA_20251119_020`
+- Example for Nov 25, 2025: `DA_20251125_001`, `DA_20251125_002`, ..., `DA_20251125_020`
+- Each week generates unique IDs, preventing Elasticsearch collisions
 
 ## 🐳 Docker Deployment
 
