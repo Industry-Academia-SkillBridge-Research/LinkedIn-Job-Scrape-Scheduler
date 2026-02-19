@@ -1,28 +1,28 @@
-requests==2.31.0
-beautifulsoup4==4.12.2
-lxml==4.9.3
-scrapy==2.11.0
-selenium==4.15.2
-pandas==2.1.3
-python-dotenv==1.0.0
-fake-useragent==1.4.0
-webdriver-manager==4.0.1
+requests
+beautifulsoup4
+lxml
+scrapy
+selenium
+pandas
+python-dotenv
+fake-useragent
+webdriver-manager
 
 
 # FastAPI server (core dependencies only - no Selenium)
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
-requests==2.31.0
-beautifulsoup4==4.12.2
-lxml==4.9.3
-pandas==2.1.3
-fake-useragent==1.4.0
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+requests
+beautifulsoup4
+lxml
+pandas
+fake-useragent
 
 # Scheduler
-schedule==1.2.0
-python-dateutil==2.8.2
+schedule
+python-dateutil
 
-# Elasticsearch
-elasticsearch==8.11.1
+# Elasticsearch (pinned to v8.x to match Elasticsearch server 8.11.1)
+elasticsearch>=8.0.0,<9.0.0

@@ -58,6 +58,7 @@ class LinkedInScraperBS:
         print(f"Searching for '{keywords}' jobs in '{location}'...")
         
         jobs = []
+        seen_job_urls = set()  # Deduplication guard
         start = 0
         
         while len(jobs) < max_jobs:
@@ -88,23 +89,37 @@ class LinkedInScraperBS:
                     print("No more jobs found.")
                     break
                 
-                # Extract job information
+                # Extract job information — track how many new jobs this page adds
+                new_jobs_this_page = 0
                 for card in job_cards:
                     if len(jobs) >= max_jobs:
                         break
                     
                     job_data = self._extract_job_data(card)
                     if job_data:
+                        job_url = job_data.get('job_url', '')
+                        # Skip already-seen jobs (LinkedIn recycling results)
+                        if job_url and job_url in seen_job_urls:
+                            continue
+                        if job_url:
+                            seen_job_urls.add(job_url)
+                        
                         # Fetch detailed information if requested
-                        if fetch_details and job_data.get('job_url'):
+                        if fetch_details and job_url:
                             print(f"  Fetching details for: {job_data['title']}")
-                            details = self.get_job_details(job_data['job_url'])
+                            details = self.get_job_details(job_url)
                             if details:
                                 job_data.update(details)
                             random_delay(self.delay_min, self.delay_max)
                         
                         jobs.append(job_data)
+                        new_jobs_this_page += 1
                         print(f"Scraped: {job_data['title']} at {job_data['company']}")
+                
+                # Stop if LinkedIn returned no new unique jobs (results exhausted)
+                if new_jobs_this_page == 0:
+                    print("No new unique jobs on this page — results exhausted.")
+                    break
                 
                 # Move to next page
                 start += 25
