@@ -26,3 +26,6 @@ python-dateutil
 
 # Elasticsearch (pinned to v8.x to match Elasticsearch server 8.11.1)
 elasticsearch>=8.0.0,<9.0.0
+
+# Neo4j (for auto-importing scraped jobs into knowledge graph)
+py2neo

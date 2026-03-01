@@ -48,6 +48,16 @@ class Settings(BaseSettings):
     SCHEDULER_DAY: str = "monday"
     SCHEDULER_TIME: str = "09:00"
     
+    # Auto-scrape on startup (runs once if Elasticsearch index is empty)
+    AUTO_SCRAPE_ON_STARTUP: bool = False
+    AUTO_SCRAPE_MAX_JOBS: int = 5
+    
+    # Neo4j Configuration (for auto-importing scraped jobs into knowledge graph)
+    NEO4J_ENABLED: bool = False
+    NEO4J_URI: str = "bolt://localhost:7687"
+    NEO4J_USER: str = "neo4j"
+    NEO4J_PASSWORD: str = "neo4j"
+    
     # Job Quality Settings
     MAX_POST_AGE_DAYS: int = 21
     JOBS_PER_ROLE: int = 20
