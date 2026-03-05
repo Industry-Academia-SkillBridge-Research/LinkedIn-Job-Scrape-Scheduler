@@ -1,8 +1,10 @@
 services:
-  # Elasticsearch Service
+  # Elasticsearch Service (only starts with: docker compose --profile scraper up)
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     container_name: linkedin-elasticsearch
+    profiles:
+      - scraper
     environment:
       # Single-node cluster (for development/small scale)
       - discovery.type=single-node
@@ -30,10 +32,12 @@ services:
       timeout: 10s
       retries: 5
 
-  # LinkedIn Scraper API Service
+  # LinkedIn Scraper API Service (only starts with: docker compose --profile scraper up)
   scraper-api:
     build: .
     container_name: linkedin-scraper-api
+    profiles:
+      - scraper
     ports:
       # Expose API on port 8000
       - "8000:8000"
